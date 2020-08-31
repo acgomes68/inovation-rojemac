@@ -19,7 +19,7 @@ WORKDIR /usr/app
 COPY package*.json ./
 
 # Install and update standard packages
-RUN npm install
+RUN yarn install
 
 # Copy from project files to container
 COPY . .

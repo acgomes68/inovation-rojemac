@@ -1,12 +1,26 @@
 version: "3"
 
 services:
-  backend:
+  node:
     build: .
+    depends_on:
+      - postgres
     image: acgomes68/alpine-node:latest
-    container_name: omnistack-${APP_NAME}
+    restart: always
+    container_name: node-${APP_NAME}
     command: npm start
     ports:
     - ${APP_PORT}:3333
     volumes:
     - .:/usr/app
+
+  postgres:
+    image: postgres:11-alpine
+    restart: always
+    container_name: postgres-${POSTGRES_DATABASE}
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
+    ports:
+    - ${POSTGRES_PORT}:5432
+    volumes:
+    - ./data/postgres:/var/lib/postgresql/data

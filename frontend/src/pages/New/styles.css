@@ -1,0 +1,38 @@
+label#thumbnail {
+    margin-bottom: 20px;
+    border: 1px dashed #ddd;
+    background-size: cover;
+    cursor: pointer;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+label#thumbnail input {
+    display: none;
+}
+
+label#thumbnail.has-thumbnail {
+    border: 0;
+}
+
+label#thumbnail.has-thumbnail img {
+    display: none;
+}
+
+.content div.divNewButtons {
+    width: 100%;
+    border: 0;
+    padding: 0;
+}
+.content button.btnNewCadastrar {
+    width: 25% !important;
+    padding: 0 10px;
+}
+
+.content button.btnVoltar {
+    width: 25% !important;
+    margin-left: 50%;
+    padding: 0 10px;
+}

@@ -1,63 +1,113 @@
-# Makefile for Docker NodeJS Postgres Redis
+# Makefile for Docker NodeJS Postgres
 
 include .env
+
+NODE_UP := $(shell docker-compose ps | grep node)
+POSTGRES_UP := $(shell docker-compose ps | grep postgres)
 
 help:
 	@echo ""
 	@echo "usage: make COMMAND"
 	@echo ""
 	@echo "Commands:"
-	@echo "  clean      Clean directories for reset"
-	@echo "  update     Update Node dependencies with yarn"
-	@echo "  install    Create and start containers"
-	@echo "  uninstall  Stop and clear all services"
+	@echo "  clean      Drop database and clean dependencies"
+	@echo "  install    Create and start containers, create database, run migrations and seeds"
 	@echo "  logs       Watch log output"
+	@echo "  restart    Restart all containers"
 	@echo "  start      Start all containers"
 	@echo "  stop       Stop all services"
-	@echo "  restart    Restart all containers"
-	@echo "  test       Test application"
+	@echo "  test       Run eslint and application unit tests "
+	@echo "  uninstall  Stop and clear all services"
+	@echo "  update     Update Node dependencies with yarn"
 
 init:
-	@$(shell cp -n $(shell pwd)/frontend/web/app/composer.json.dist $(shell pwd)/frontend/web/app/composer.json 2> /dev/null)
+	@docker run --rm -v $(shell pwd):/app acgomes68/alpine-node:latest yarn install && yarn upgrade
 
 clean:
-	@rm -Rf ./frontend/data/db/mysql/*
-	@rm -Rf ./frontend/web/app/vendor
-	@rm -Rf ./frontend/web/app/composer.lock
-	@rm -Rf ./frontend/web/app/doc
-	@rm -Rf ./frontend/web/app/report
-	@rm -Rf ./frontend/etc/ssl/*
+	@make node-up
+	@docker-compose exec node rm -Rf app/node_modules
 
-update: init
-	@docker run --rm -v $(shell pwd)/frontend/web/public:/app acgomes68/alpine-php-cli-composer:7.2.15 update
+create-db:
+	@make drop-db
+	@docker-compose exec postgres psql -U $(POSTGRES_USER) --command="CREATE DATABASE $(POSTGRES_DATABASE)"
+
+drop-db:
+	@make postgres-up
+	@docker-compose exec postgres psql -U $(POSTGRES_USER) --command="DROP DATABASE IF EXISTS $(POSTGRES_DATABASE);"
 
 install: init
 	@make start
 	@make create-db
+	@make migrations
+	@make seeds
+	@make test
 
-uninstall:
-	@make stop
-	@make clean
-
-start:
-	@docker-compose up -d
-	@make resetOwner
-
-stop:
-	@docker-compose down -v --remove-orphans
-
-restart:
-	@docker-compose restart
-	@make resetOwner
+lint:
+	@docker-compose exec node yarn eslint --fix src --ext .js
 
 logs:
 	@docker-compose logs -f
 
-test: code-sniff
-	@docker-compose exec -T php ./app/vendor/bin/phpunit --colors=always --configuration ./app/
-	@make resetOwner
+migrations:
+	@docker-compose exec node yarn sequelize db:migrate
 
-resetOwner:
-	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/frontend/etc/ssl" "$(shell pwd)/frontend/web/app" 2> /dev/null)
+node-up:
+	@if [ "$(NODE_UP)" = '' ]; then\
+		echo "Node is down";\
+		docker-compose up -d node;\
+	else\
+		echo "Node is up";\
+	fi;
 
-.PHONY: clean test code-sniff init
+node-down:
+	@if [ "$(NODE_UP)" = '' ]; then\
+		echo "Node is down";\
+	else\
+		echo "Node is up";\
+        docker-compose down -v node;\
+	fi;
+
+postgres-down:
+	@if [ "$(POSTGRES_UP)" = '' ]; then\
+		echo "Postgres is down";\
+	else\
+		echo "Postgres is up";\
+        docker-compose down -v postgres;\
+	fi;
+
+postgres-up:
+	@if [ "$(POSTGRES_UP)" = '' ]; then\
+		echo "Postgres is down";\
+		docker-compose up -d postgres;\
+	else\
+		echo "Postgres is up";\
+	fi;
+
+restart:
+	@docker-compose restart
+
+seeds:
+	@docker-compose exec node yarn sequelize db:seed:all
+
+start:
+	@docker-compose up -d
+
+stop:
+	@docker-compose down -v --remove-orphans
+
+test:
+	@make lint
+	@#make unit
+
+uninstall:
+	@make clean
+	@make stop
+	@make drop-db;
+
+unit:
+	@docker-compose exec node yarn eslint --fix src --ext .js
+
+update: init
+	@docker run --rm -v $(shell pwd):/app acgomes68/alpine-node:latest yarn upgrade && yarn install
+
+.PHONY: clean test init

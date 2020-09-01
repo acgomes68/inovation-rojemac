@@ -16,7 +16,6 @@
     "stop": "killall node"
   },
   "dependencies": {
-    "bee-queue": "^1.2.2",
     "body-parser": "^1.15.2",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",

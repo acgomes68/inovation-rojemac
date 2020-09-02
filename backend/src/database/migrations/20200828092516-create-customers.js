@@ -28,7 +28,7 @@ module.exports = {
                 allowNull: true,
             },
             address_complement: {
-                type: Sequelize.STRING(20),
+                type: Sequelize.STRING(100),
                 allowNull: true,
             },
             city: {

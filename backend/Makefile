@@ -21,7 +21,7 @@ help:
 	@echo "  update     Update Node dependencies with yarn"
 
 init:
-	@docker run --rm -v $(shell pwd):/app acgomes68/alpine-node:latest yarn install && yarn upgrade
+	@docker run --rm -v $(shell pwd) acgomes68/alpine-node:latest yarn install
 
 clean:
 	@make node-up
@@ -35,7 +35,8 @@ drop-db:
 	@make postgres-up
 	@docker-compose exec postgres psql -U $(POSTGRES_USER) --command="DROP DATABASE IF EXISTS $(POSTGRES_DATABASE);"
 
-install: init
+install:
+	@make update
 	@make start
 	@make create-db
 	@make migrations
@@ -64,7 +65,7 @@ node-down:
 		echo "Node is down";\
 	else\
 		echo "Node is up";\
-        docker-compose down -v node;\
+		docker-compose down -v node;\
 	fi;
 
 postgres-down:
@@ -72,7 +73,7 @@ postgres-down:
 		echo "Postgres is down";\
 	else\
 		echo "Postgres is up";\
-        docker-compose down -v postgres;\
+		docker-compose down -v postgres;\
 	fi;
 
 postgres-up:
@@ -97,7 +98,7 @@ stop:
 
 test:
 	@make lint
-	@#make unit
+	@make unit
 
 uninstall:
 	@make clean
@@ -108,6 +109,6 @@ unit:
 	@docker-compose exec node yarn eslint --fix src --ext .js
 
 update: init
-	@docker run --rm -v $(shell pwd):/app acgomes68/alpine-node:latest yarn upgrade && yarn install
+	@docker run --rm -v $(shell pwd) acgomes68/alpine-node:latest yarn upgrade
 
 .PHONY: clean test init

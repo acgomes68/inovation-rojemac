@@ -7,7 +7,7 @@ class Customer extends Model {
                 cnpj: Sequelize.STRING(14),
                 name: Sequelize.STRING(100),
                 address: Sequelize.STRING(100),
-                address_number: Sequelize.STRING,
+                address_number: Sequelize.STRING(20),
                 address_complement: Sequelize.STRING(100),
                 city: Sequelize.STRING(100),
                 state: Sequelize.STRING(2),

@@ -156,13 +156,21 @@ module.exports = {
                 }
 
                 const {
+                    // eslint-disable-next-line no-unused-vars
                     address,
+                    // eslint-disable-next-line no-unused-vars
                     address_number,
+                    // eslint-disable-next-line no-unused-vars
                     address_complement,
+                    // eslint-disable-next-line no-unused-vars
                     city,
+                    // eslint-disable-next-line no-unused-vars
                     state,
+                    // eslint-disable-next-line no-unused-vars
                     zip,
+                    // eslint-disable-next-line no-unused-vars
                     phone,
+                    // eslint-disable-next-line no-unused-vars
                     email,
                 } = await customer.update(req.body);
 

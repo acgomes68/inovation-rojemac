@@ -24,8 +24,8 @@ RUN yarn install
 # Copy from project files to container
 COPY . .
 
-# Expose container port 3333
-EXPOSE 3333
+# Expose container port 3000
+EXPOSE 3000
 
 # Run npm start command (scripts>start in package.json)
 CMD ["npm", "start"]

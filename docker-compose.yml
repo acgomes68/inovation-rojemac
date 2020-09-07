@@ -7,12 +7,25 @@ services:
       - postgres
     image: acgomes68/alpine-node:latest
     restart: always
-    container_name: node-${APP_NAME}
+    container_name: node-${API_NAME}
     command: npm start
     ports:
-    - ${APP_PORT}:3333
+    - ${API_PORT}:3000
     volumes:
-    - .:/usr/app
+    - ./backend:/usr/app
+
+  react:
+    build: .
+    depends_on:
+      - node
+    image: acgomes68/alpine-node:latest
+    restart: always
+    container_name: react-${APP_NAME}
+    command: npm start
+    ports:
+    - ${APP_PORT}:3000
+    volumes:
+    - ./frontend:/usr/app
 
   postgres:
     image: postgres:11-alpine
@@ -23,4 +36,4 @@ services:
     ports:
     - ${POSTGRES_PORT}:5432
     volumes:
-    - ./data/postgres:/var/lib/postgresql/data
+    - ./backend/data/postgres:/var/lib/postgresql/data

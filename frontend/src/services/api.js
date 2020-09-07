@@ -3,7 +3,7 @@ import axios from 'axios';
 import config from '../config';
 
 const api = axios.create({
-    baseURL: `${config.REACT_APP_API_URL}:${config.REACT_APP_API_PORT}`,
+    baseURL: `${config.API_URL}:${config.API_PORT}`,
 })
 
 export default api;

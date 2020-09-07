@@ -13,7 +13,7 @@ export default function Dashboard() {
 
     const user_id = localStorage.getItem('user');
     const socket = useMemo(() => {
-        return socketio(`${config.REACT_APP_API_URL}:${config.REACT_APP_API_PORT}`, {
+        return socketio(`${config.API_URL}:${config.API_PORT}`, {
             query: { user_id },
         });
     }, [user_id]);

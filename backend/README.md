@@ -57,7 +57,7 @@ No que tange ao frontend foi criada uma interface em React responsável por cons
 
 ## Tecnologias:
 - <b>NodeJS</b>: linguagem Javascript backend voltada para a construção das API's;
-- <b>Postgres</b>: banco de dados relacional utilizado para armazenamento as informações estatísticas;
+- <b>Postgres</b>: banco de dados relacional utilizado para armazenamento das informações;
 <br /><br />
 
 ## Dependências:
@@ -80,13 +80,15 @@ No que tange ao frontend foi criada uma interface em React responsável por cons
 <br /><br />
 
 ## Instalação
+
+Atualizar as informações no arquivo .env.example e renomeá-lo para .env. Após isso, através do terminal executar:<br />
 <code>make install</code><br />
 
 Após o final da instalação, acessar os serviços através do endpoint:<br />
-http://localhost:3000/
+http://localhost:3333/
 
 Exemplo:<br />
-http://localhost:3000/users
+http://localhost:3333/customers
 <br /><br />
 
 ## Testes

@@ -2,31 +2,51 @@ version: "3"
 
 services:
   node:
-    build: .
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
     depends_on:
       - postgres
     image: acgomes68/alpine-node:latest
     restart: always
     container_name: node-${API_NAME}
+    environment:
+        - CHOKIDAR_USEPOLLING=true
+        - API_HOST=${API_HOST}
+        - API_PORT=${API_PORT}
+        - POSTGRES_HOST=${POSTGRES_HOST}
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWD=${POSTGRES_PASSWD}
+        - POSTGRES_DATABASE=${POSTGRES_DATABASE}
     command: npm start
     ports:
     - ${API_PORT}:3000
     volumes:
     - ./backend:/usr/app
-
-  react:
-    build: .
-    depends_on:
-      - node
-    image: acgomes68/alpine-node:latest
-    restart: always
-    container_name: react-${APP_NAME}
-    command: npm start
-    ports:
-    - ${APP_PORT}:3000
-    volumes:
-    - ./frontend:/usr/app
-
+    # - /usr/app/node_modules
+      
+  # react:
+  #   build:
+  #     context: .
+  #     dockerfile: ./frontend/Dockerfile
+  #   depends_on:
+  #     - node
+  #   image: acgomes68/alpine-node-react:latest
+  #   restart: always
+  #   container_name: react-${APP_NAME}
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #     - API_URL=${API_URL}
+  #     - API_PORT=${API_PORT}
+  #     - API_CNPJ=${API_CNPJ}
+  #   command: npm start
+  #   stdin_open: true
+  #   ports:
+  #   - ${APP_PORT}:3000
+  #   volumes:
+  #   - ./frontend:/usr/app
+  #   - /usr/app/node_modules
+    
   postgres:
     image: postgres:11-alpine
     restart: always

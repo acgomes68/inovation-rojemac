@@ -3,6 +3,7 @@
 include .env
 
 NODE_UP := $(shell docker-compose ps | grep node)
+REACT_UP := $(shell docker-compose ps | grep react)
 POSTGRES_UP := $(shell docker-compose ps | grep postgres)
 
 help:
@@ -21,11 +22,14 @@ help:
 	@echo "  update     Update Node dependencies with yarn"
 
 init:
-	@docker run --rm -v $(shell pwd) acgomes68/alpine-node:latest yarn install
+	@docker run --rm -v $(shell pwd)/backend acgomes68/alpine-node:latest yarn install
+	@docker run --rm -v $(shell pwd)/frontend acgomes68/alpine-node:latest yarn install
 
 clean:
 	@make node-up
+	@make react-up
 	@docker-compose exec node rm -Rf app/node_modules
+	@docker-compose exec react rm -Rf app/node_modules
 
 create-db:
 	@make drop-db
@@ -45,6 +49,7 @@ install:
 
 lint:
 	@docker-compose exec node yarn eslint --fix src --ext .js
+	@docker-compose exec react yarn eslint --fix src --ext .js
 
 logs:
 	@docker-compose logs -f
@@ -58,14 +63,6 @@ node-up:
 		docker-compose up -d node;\
 	else\
 		echo "Node is up";\
-	fi;
-
-node-down:
-	@if [ "$(NODE_UP)" = '' ]; then\
-		echo "Node is down";\
-	else\
-		echo "Node is up";\
-		docker-compose down -v node;\
 	fi;
 
 postgres-down:
@@ -82,6 +79,14 @@ postgres-up:
 		docker-compose up -d postgres;\
 	else\
 		echo "Postgres is up";\
+	fi;
+
+react-up:
+	@if [ "$(REACT_UP)" = '' ]; then\
+		echo "React is down";\
+		docker-compose up -d react;\
+	else\
+		echo "React is up";\
 	fi;
 
 restart:
@@ -107,8 +112,10 @@ uninstall:
 
 unit:
 	@docker-compose exec node yarn eslint --fix src --ext .js
+	@docker-compose exec react yarn eslint --fix src --ext .js
 
 update: init
-	@docker run --rm -v $(shell pwd) acgomes68/alpine-node:latest yarn upgrade
+	@docker run --rm -v $(shell pwd)/backend acgomes68/alpine-node:latest yarn upgrade
+	@docker run --rm -v $(shell pwd)/frontend acgomes68/alpine-node:latest yarn upgrade
 
 .PHONY: clean test init

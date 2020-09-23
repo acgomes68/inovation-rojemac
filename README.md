@@ -97,13 +97,13 @@ http://localhost:3333/customers
 <br /><br />
 
 ## Modelo de dados
-![Screenshot](der-cliente-pj.png)
+![Screenshot](./public/der-cliente-pj.png)
 <br /><br />
 
 ## GUI Teste API's
-Foi utilizado o Insomnia para teste manual de cada serviço da API. Arquivo JSON contendo as informações, bem como os parâmetros utilizados disponíveis no repositório para importação, caso seja conveniente.
+Foi utilizado o Foi utilizado o [Insomnia](https://insomnia.rest/) para teste manual de cada serviço da API. Arquivo JSON contendo as informações, bem como os parâmetros utilizados disponíveis no repositório em [./public/insomnia-cliente-pj.json](./public/insomnia-cliente-pj.json) para importação, caso seja conveniente.
 
-![Screenshot](insomnia-view.png)
+![Screenshot](./public/insomnia-view.png)
 <br /><br />
 
 ## Referências

@@ -16,24 +16,28 @@ help:
 	@echo "  logs       Watch log output"
 	@echo "  restart    Restart all containers"
 	@echo "  start      Start all containers"
+	@echo "  status     Show containers current status"
 	@echo "  stop       Stop all services"
 	@echo "  test       Run eslint and application unit tests "
 	@echo "  uninstall  Stop and clear all services"
 	@echo "  update     Update Node dependencies with yarn"
 
 init:
-	@docker run --rm -v $(shell pwd)/backend acgomes68/alpine-node:latest yarn install
-	@docker run --rm -v $(shell pwd)/frontend acgomes68/alpine-node:latest yarn install
+	@make react-up
+	@docker-compose exec react yarn install
+	@docker-compose exec node yarn install
 
 clean:
-	@make node-up
 	@make react-up
-	@docker-compose exec node rm -Rf app/node_modules
-	@docker-compose exec react rm -Rf app/node_modules
+	@docker-compose exec react rm -Rf /home/node/app/node_modules
+	@docker-compose exec node rm -Rf /home/node/app/node_modules
 
 create-db:
 	@make drop-db
 	@docker-compose exec postgres psql -U $(POSTGRES_USER) --command="CREATE DATABASE $(POSTGRES_DATABASE)"
+
+down:
+	@docker-compose down -v --rmi local
 
 drop-db:
 	@make postgres-up
@@ -48,19 +52,29 @@ install:
 	@make test
 
 lint:
-	@docker-compose exec node yarn eslint --fix src --ext .js
+	@make react-up	
 	@docker-compose exec react yarn eslint --fix src --ext .js
+	@docker-compose exec node yarn eslint --fix src --ext .js
 
 logs:
 	@docker-compose logs -f
 
 migrations:
+	@make node-up
 	@docker-compose exec node yarn sequelize db:migrate
+
+node-down:
+	@if [ "$(NODE_UP)" = '' ]; then\
+		echo "Node is down";\
+	else\
+		echo "Node is up";\
+		make down;\
+	fi;
 
 node-up:
 	@if [ "$(NODE_UP)" = '' ]; then\
 		echo "Node is down";\
-		docker-compose up -d node;\
+		docker-compose up -d --no-deps node;\
 	else\
 		echo "Node is up";\
 	fi;
@@ -70,7 +84,7 @@ postgres-down:
 		echo "Postgres is down";\
 	else\
 		echo "Postgres is up";\
-		docker-compose down -v postgres;\
+		make down;\
 	fi;
 
 postgres-up:
@@ -79,6 +93,14 @@ postgres-up:
 		docker-compose up -d postgres;\
 	else\
 		echo "Postgres is up";\
+	fi;
+
+react-down:
+	@if [ "$(REACT_UP)" = '' ]; then\
+		echo "React is down";\
+	else\
+		echo "React is up";\
+		make down;\
 	fi;
 
 react-up:
@@ -93,10 +115,14 @@ restart:
 	@docker-compose restart
 
 seeds:
+	@make node-up
 	@docker-compose exec node yarn sequelize db:seed:all
 
 start:
 	@docker-compose up -d
+
+status:
+	@docker-compose ps
 
 stop:
 	@docker-compose down -v --remove-orphans
@@ -111,11 +137,13 @@ uninstall:
 	@make drop-db;
 
 unit:
-	@docker-compose exec node yarn eslint --fix src --ext .js
+	@make react-up
 	@docker-compose exec react yarn eslint --fix src --ext .js
+	@docker-compose exec node yarn eslint --fix src --ext .js
 
 update: init
-	@docker run --rm -v $(shell pwd)/backend acgomes68/alpine-node:latest yarn upgrade
-	@docker run --rm -v $(shell pwd)/frontend acgomes68/alpine-node:latest yarn upgrade
+	@make react-up
+	@docker-compose exec react yarn upgrade
+	@docker-compose exec node yarn upgrade
 
 .PHONY: clean test init

@@ -4,7 +4,7 @@ services:
   node:
     build:
       context: ./backend
-      dockerfile: ./backend/Dockerfile
+      dockerfile: .
     depends_on:
       - postgres
     image: acgomes68/alpine-node:latest
@@ -17,7 +17,7 @@ services:
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWD=${POSTGRES_PASSWD}
         - POSTGRES_DATABASE=${POSTGRES_DATABASE}
-    command: npm start
+    command: yarn start
     ports:
     - ${API_PORT}:3000
     volumes:
@@ -26,7 +26,7 @@ services:
   react:
     build:
       context: ./frontend
-      dockerfile: ./frontend/Dockerfile
+      dockerfile: .
     depends_on:
       - node
     image: acgomes68/alpine-node-react:latest
@@ -36,7 +36,7 @@ services:
       - API_URL=${API_URL}
       - API_PORT=${API_PORT}
       - API_CNPJ=${API_CNPJ}
-    command: npm start
+    command: yarn start
     stdin_open: true
     ports:
     - ${APP_PORT}:3000

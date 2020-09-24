@@ -23,9 +23,16 @@ help:
 	@echo "  update     Update Node dependencies with yarn"
 
 init:
+	@make init-node
+	@make init-react
+
+init-node:
+	@make node-up
+	@docker-compose exec node yarn install
+
+init-react:
 	@make react-up
 	@docker-compose exec react yarn install
-	@docker-compose exec node yarn install
 
 clean:
 	@make react-up
@@ -79,6 +86,10 @@ node-up:
 		echo "Node is up";\
 	fi;
 
+node-update:init-node
+	@make node-up
+	@docker-compose exec node yarn upgrade
+
 postgres-down:
 	@if [ "$(POSTGRES_UP)" = '' ]; then\
 		echo "Postgres is down";\
@@ -111,6 +122,10 @@ react-up:
 		echo "React is up";\
 	fi;
 
+react-update:init-react
+	@make react-up
+	@docker-compose exec react yarn upgrade
+
 restart:
 	@docker-compose restart
 
@@ -141,9 +156,8 @@ unit:
 	@docker-compose exec react yarn eslint --fix src --ext .js
 	@docker-compose exec node yarn eslint --fix src --ext .js
 
-update: init
-	@make react-up
-	@docker-compose exec react yarn upgrade
-	@docker-compose exec node yarn upgrade
+update:
+	@make node-update
+	@make react-update
 
 .PHONY: clean test init

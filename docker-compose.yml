@@ -8,8 +8,7 @@ services:
     depends_on:
       - postgres
     image: acgomes68/alpine-node:latest
-    restart: always
-    container_name: node-${API_NAME}
+    container_name: node-${APP_NAME}
     environment:
         - CHOKIDAR_USEPOLLING=true
         - API_HOST=${API_HOST}
@@ -31,7 +30,6 @@ services:
     depends_on:
       - node
     image: acgomes68/alpine-node-react:latest
-    restart: always
     container_name: react-${APP_NAME}
     environment:
       - CHOKIDAR_USEPOLLING=true
@@ -44,15 +42,16 @@ services:
     - ${APP_PORT}:3000
     volumes:
     - ./frontend:/home/node/app
-    # - /home/node/app/node_modules
     
   postgres:
     image: postgres:11-alpine
-    restart: always
-    container_name: postgres-${POSTGRES_DATABASE}
+    container_name: postgres-${APP_NAME}
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWD}
     ports:
     - ${POSTGRES_PORT}:5432
     volumes:
-    - ./backend/data/postgres:/var/lib/postgresql/data
+    - cliente-pj-data:/var/lib/postgresql/data
+
+volumes:
+    cliente-pj-data:
